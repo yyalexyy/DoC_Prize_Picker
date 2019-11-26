@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <random>
+#include <ctime>
 #include "Header.h"
 
 using namespace std;
@@ -59,17 +60,25 @@ void selection()
 		//find 5 random winners
 		for (int i = 0; i < 5; i++)
 		{
+			//bool isSame = false;
+
+			//tempStudentArray[i] = studentNameVector[rand(static_cast<int>(time(0)))]; 
 			tempStudentArray[i] = studentNameVector[rand() % studentNameVector.size()];
-			cout << tempStudentArray[i] << endl;
 
-			for (int j = 0; j < tempStudentArray->length; j++)
+			for (int j = 0; j < tempStudentArray->size(); j++)
 			{
-				if (tempStudentArray[j] == tempStudentArray[i])
+				if ((j != i) && (tempStudentArray[j] == tempStudentArray[i]))
 				{
-
+					tempStudentArray[i] = pickAWinner(studentNameVector, tempStudentArray, i);
+					break;
 				}
+
+				else
+					continue; 
 			}
 		}
+		for (int i = 0; i < 5; i++)
+			cout << tempStudentArray[i] << endl;
 
 		//step 1: prizeVector[distrForPrizes]; 
 		//step 2: check if the called prize is in the temp array
@@ -91,6 +100,33 @@ void selection()
 		student_names.close();
 		winners.close();
 
-		//return 5 winners & 5 prizes
+		//print out 5 random students from student_names
+		//print out 5 random prizes from prizes
 	}
 }
+
+string pickAWinner(vector<string> vec, string array[], int index)
+{
+	bool isSame = false; 
+
+	do
+	{
+		array[index] = vec[rand() % vec.size()];
+		
+		for (int i = 0; i < array->size(); i++)
+		{
+			if ((index != i) && array[index] == array[i])
+				isSame = true; 
+		}
+
+	} while (isSame == true);
+
+	if (isSame == false)
+		return array[index];
+}
+
+//new theory: 
+//fill all 5 names into the tempStudentArray
+//use the std::count function to find where all the duplicates are
+//call the pickAWinner function to replace the duplicate values
+//continue this until all duplicates have been replaced
