@@ -77,7 +77,7 @@ void selection()
 						tempStudentArray[i] = "null";
 					else
 					{
-						//otherwise, call generateAgain function to get a new value
+						//otherwise, call pickAWinner function to get a new value
 						tempStudentArray[i] = generateAgain(studentNameVector, tempStudentArray, i);
 						break;
 					}
@@ -86,13 +86,13 @@ void selection()
 					continue;
 			}
 		}
+			
 		//Display the 5 names
 		cout << "Generate 5 names: " << endl;
 		for (int i = 0; i < genNum; i++) {
 			cout << (i + 1) << ". " << tempStudentArray[i] << endl;
 		}
 		cout << endl;
-
 
 		//Find 5 random prizes
 		for (int i = 0; i < genNum; i++) {
@@ -118,23 +118,6 @@ void selection()
 			cout << (i+1) << ". " << tempPrizeArray[i] << endl;
 		}
 		cout << endl;
-
-		/*ofstream prizes1;
-		prizes1.open("prizes1.txt");
-		while (getline(prizes, line)) {
-			int i = 0;
-			if (line != tempPrizeArray[i])
-				prizes1 << line << endl;
-		}
-		remove("prizes1.txt");
-		rename("prizes1.txt", "prizes1.txt");
-		*/
-
-		// Save the names and prizes into prizeWinners.txt
-
-
-
-		// Renmove the names and prizes from the text files
 
 
 
