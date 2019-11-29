@@ -3,13 +3,14 @@
 #include <string>
 #include <vector>
 #include <random>
-#include <ctime>
 #include "Header.h"
 
 using namespace std;
 
 void selection()
 {
+
+
 	//adding the files into the program
 	//"prizes1" contains the first 24 prizes
 	ifstream prizes("prizes1.txt", ios::in);
@@ -19,8 +20,9 @@ void selection()
 	vector<string> studentNameVector;
 	vector<string> prizeWinnerVector;
 	string line;
-	string tempPrizeArray[5];
-	string tempStudentArray[5];
+	const int genNum = 5;
+	string tempPrizeArray[genNum];
+	string tempStudentArray[genNum];
 
 	//check if files are valid before proceeding; print some kind of message if there's an error
 	if (!prizes || !student_names || !winners)
@@ -57,28 +59,147 @@ void selection()
 			}
 		}
 
-		//find 5 random winners
-		for (int i = 0; i < 5; i++)
+		//Find 5 random winners
+		for (int i = 0; i < genNum; i++)
 		{
-			//bool isSame = false;
-
-			//tempStudentArray[i] = studentNameVector[rand(static_cast<int>(time(0)))]; 
+			//pick a random index in the array and assign it to the tempStudentArray
 			tempStudentArray[i] = studentNameVector[rand() % studentNameVector.size()];
 
-			for (int j = 0; j < tempStudentArray->size(); j++)
+			//checking the entire tempStudentArray for duplicates
+			for (int j = 0; j < genNum; j++)
 			{
+				//if the indexes don't equal one another and a duplicate is found
 				if ((j != i) && (tempStudentArray[j] == tempStudentArray[i]))
 				{
-					tempStudentArray[i] = pickAWinner(studentNameVector, tempStudentArray, i);
-					break;
+					//if there are fewer students in the room than there are indexes in the tempStudentArray
+					if (studentNameVector.size() < genNum)
+						//enter a blank value
+						tempStudentArray[i] = "null";
+					else
+					{
+						//otherwise, call generateAgain function to get a new value
+						tempStudentArray[i] = generateAgain(studentNameVector, tempStudentArray, i);
+						break;
+					}
 				}
-
 				else
 					continue;
 			}
 		}
-		for (int i = 0; i < 5; i++)
-			cout << tempStudentArray[i] << endl;
+
+		//Erase the names from studentNames.txt file
+		/*for (int i = 0; i < genNum; i++) {
+			studentNameVector.erase(std::remove(studentNameVector.begin(), studentNameVector.end(), tempStudentArray[i]), studentNameVector.end());
+		}
+
+		for (auto t = studentNameVector.begin(); t != studentNameVector.end(); ++t)
+			std::cout << "vector names: "<< *t << '\n';
+		ofstream newNames;
+		newNames.open("studentNames.txt", ios::app);
+		for (auto t = studentNameVector.begin(); t != studentNameVector.end(); ++t)
+		{
+			newNames << *t << '\n';
+		}*/
+
+		/*string nameFileContenet = "";
+		char ch;
+		while (student_names >> std::noskipws >> ch) {
+			nameFileContenet += ch;
+		}
+		cout << "File content: " << nameFileContenet << endl;*/
+
+
+
+		//Display the 5 names
+		cout << "Generate 5 names: " << endl;
+		for (int i = 0; i < genNum; i++) {
+			cout << (i + 1) << ". " << tempStudentArray[i] << endl;
+		}
+		cout << endl;
+
+
+		//Find 5 random prizes
+		for (int i = 0; i < genNum; i++) {
+			tempPrizeArray[i] = prizeVector[rand() % prizeVector.size()];
+
+			for (int j = 0; j < genNum; j++) {
+				if (i != j) {
+					if (tempPrizeArray[i] == tempPrizeArray[j]) {
+						if (prizeVector.size() < genNum) {
+							tempPrizeArray[i] = "null";
+						}
+						else {
+							tempPrizeArray[i] = generateAgain(prizeVector, tempPrizeArray, i);
+							break;
+						}
+					}
+				}
+			}
+		}
+		//Display the 5 prizes
+		cout << "Generate 5 prizes: " << endl;
+		for (int i = 0; i < genNum; i++) {
+			cout << (i + 1) << ". " << tempPrizeArray[i] << endl;
+		}
+		cout << endl;
+
+		/*ofstream prizes1;
+		prizes1.open("prizes1.txt");
+		while (getline(prizes, line)) {
+			int i = 0;
+			if (line != tempPrizeArray[i])
+				prizes1 << line << endl;
+		}
+		remove("prizes1.txt");
+		rename("prizes1.txt", "prizes1.txt");
+		*/
+
+		//Save the names and prizes into prizeWinners.txt
+		ofstream winnerList;
+		winnerList.open("prizeWinners.txt", ios::app);
+		for (int i = 0; i < genNum; i++)
+		{
+			winnerList << tempStudentArray[i] << ": " << tempPrizeArray[i] << endl;
+		}
+
+
+		//Renmove the names and prizes from the text files
+
+
+		/*student_names.open("studentNames.txt");
+		string l;
+		ofstream temp;
+		temp.open("newNames.txt");
+		string deleteN = "Alex";
+
+		while (getline(student_names, l))
+		{
+
+				l.replace(l.find(deleteN), deleteN.length(), "");
+				temp << l << endl;
+
+		}
+
+		temp.close();
+		student_names.close();
+		remove("studentNames.txt");
+		rename("newNames.txt", "studentNames.txt");*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 		//step 1: prizeVector[distrForPrizes]; 
 		//step 2: check if the called prize is in the temp array
@@ -100,12 +221,11 @@ void selection()
 		student_names.close();
 		winners.close();
 
-		//print out 5 random students from student_names
-		//print out 5 random prizes from prizes
+		//return 5 winners & 5 prizes
 	}
 }
 
-string pickAWinner(vector<string> vec, string array[], int index)
+string generateAgain(vector<string> vec, string array[], int index)
 {
 	bool isSame = false;
 
@@ -113,7 +233,7 @@ string pickAWinner(vector<string> vec, string array[], int index)
 	{
 		array[index] = vec[rand() % vec.size()];
 
-		for (int i = 0; i < array->size(); i++)
+		for (int i = 0; i < 5; i++)
 		{
 			if ((index != i) && array[index] == array[i])
 				isSame = true;
@@ -124,9 +244,3 @@ string pickAWinner(vector<string> vec, string array[], int index)
 	if (isSame == false)
 		return array[index];
 }
-
-//new theory: 
-//fill all 5 names into the tempStudentArray
-//use the std::count function to find where all the duplicates are
-//call the pickAWinner function to replace the duplicate values
-//continue this until all duplicates have been replaced
