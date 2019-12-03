@@ -6,6 +6,6 @@
 #include <vector>
 
 void selection();
-std::string generateAgain(std::vector<std::string> vec, std::string array[], int index);
+std::string generateAgain(std::vector<std::string> vec, std::vector<std::string> array, int index);
 
 #endif SELECTION_H

@@ -3,26 +3,27 @@
 #include <string>
 #include <vector>
 #include <random>
+#include <ctime>
 #include "Header.h"
 
 using namespace std;
 
-void selection()
+void Selection()
 {
-
-
-	//adding the files into the program
-	//"prizes1" contains the first 24 prizes
-	ifstream prizes("prizes1.txt", ios::in);
-	ifstream student_names("studentNames.txt", ios::in);
-	ifstream winners("prizeWinners.txt", ios::out | ios::app);
+	const int NUM = 5;
+	fstream prizes;
+	fstream student_names;
+	fstream winners;
 	vector<string> prizeVector;
 	vector<string> studentNameVector;
 	vector<string> prizeWinnerVector;
 	string line;
-	const int genNum = 5;
-	string tempPrizeArray[genNum];
-	string tempStudentArray[genNum];
+	vector<string> tempPrizeArray(NUM);
+	vector<string> tempStudentArray(NUM);
+
+	prizes.open("prizes1.txt", ios::in);
+	student_names.open("studentNames.txt", ios::in);
+	winners.open("prizeWinners.txt", ios::in);
 
 	//check if files are valid before proceeding; print some kind of message if there's an error
 	if (!prizes || !student_names || !winners)
@@ -32,12 +33,12 @@ void selection()
 
 	else
 	{
+		//writing contents of files into vectors
 		while (getline(prizes, line))
 		{
 			if (line.size() > 0)
 			{
 				prizeVector.push_back(line);
-				//cout << line << endl; 
 			}
 		}
 
@@ -46,7 +47,6 @@ void selection()
 			if (line.size() > 0)
 			{
 				studentNameVector.push_back(line);
-				//cout << line << endl;
 			}
 		}
 
@@ -55,24 +55,27 @@ void selection()
 			if (line.size() > 0)
 			{
 				prizeWinnerVector.push_back(line);
-				//cout << line << endl;
 			}
 		}
 
-		//Find 5 random winners
-		for (int i = 0; i < genNum; i++)
+		prizes.close();
+		student_names.close();
+		winners.close();
+
+		//find 5 random winners
+		for (int i = 0; i < NUM; i++)
 		{
 			//pick a random index in the array and assign it to the tempStudentArray
 			tempStudentArray[i] = studentNameVector[rand() % studentNameVector.size()];
 
 			//checking the entire tempStudentArray for duplicates
-			for (int j = 0; j < genNum; j++)
+			for (int j = 0; j < NUM; j++)
 			{
 				//if the indexes don't equal one another and a duplicate is found
 				if ((j != i) && (tempStudentArray[j] == tempStudentArray[i]))
 				{
 					//if there are fewer students in the room than there are indexes in the tempStudentArray
-					if (studentNameVector.size() < genNum)
+					if (studentNameVector.size() < NUM)
 						//enter a blank value
 						tempStudentArray[i] = "null";
 					else
@@ -82,150 +85,117 @@ void selection()
 						break;
 					}
 				}
+
 				else
 					continue;
 			}
 		}
 
-		//Erase the names from studentNames.txt file
-		/*for (int i = 0; i < genNum; i++) {
-			studentNameVector.erase(std::remove(studentNameVector.begin(), studentNameVector.end(), tempStudentArray[i]), studentNameVector.end());
-		}
-
-		for (auto t = studentNameVector.begin(); t != studentNameVector.end(); ++t)
-			std::cout << "vector names: "<< *t << '\n';
-		ofstream newNames;
-		newNames.open("studentNames.txt", ios::app);
-		for (auto t = studentNameVector.begin(); t != studentNameVector.end(); ++t)
+		for (int i = 0; i < NUM; i++)
 		{
-			newNames << *t << '\n';
-		}*/
-
-		/*string nameFileContenet = "";
-		char ch;
-		while (student_names >> std::noskipws >> ch) {
-			nameFileContenet += ch;
+			//loops through studentNameVector to find each item in tempStudentArray, then deletes it from studentNameVector
+			vector<string>::iterator position = find(studentNameVector.begin(), studentNameVector.end(), tempStudentArray[i]);
+			if (position != studentNameVector.end())
+				studentNameVector.erase(position);
 		}
-		cout << "File content: " << nameFileContenet << endl;*/
-
-
-
-		//Display the 5 names
-		cout << "Generate 5 names: " << endl;
-		for (int i = 0; i < genNum; i++) {
-			cout << (i + 1) << ". " << tempStudentArray[i] << endl;
-		}
-		cout << endl;
-
-
-		//Find 5 random prizes
-		for (int i = 0; i < genNum; i++) {
-			tempPrizeArray[i] = prizeVector[rand() % prizeVector.size()];
-
-			for (int j = 0; j < genNum; j++) {
-				if (i != j) {
-					if (tempPrizeArray[i] == tempPrizeArray[j]) {
-						if (prizeVector.size() < genNum) {
-							tempPrizeArray[i] = "null";
-						}
-						else {
-							tempPrizeArray[i] = generateAgain(prizeVector, tempPrizeArray, i);
-							break;
-						}
-					}
-				}
-			}
-		}
-		//Display the 5 prizes
-		cout << "Generate 5 prizes: " << endl;
-		for (int i = 0; i < genNum; i++) {
-			cout << (i + 1) << ". " << tempPrizeArray[i] << endl;
-		}
-		cout << endl;
-
-		/*ofstream prizes1;
-		prizes1.open("prizes1.txt");
-		while (getline(prizes, line)) {
-			int i = 0;
-			if (line != tempPrizeArray[i])
-				prizes1 << line << endl;
-		}
-		remove("prizes1.txt");
-		rename("prizes1.txt", "prizes1.txt");
-		*/
-
-		//Save the names and prizes into prizeWinners.txt
-		ofstream winnerList;
-		winnerList.open("prizeWinners.txt", ios::app);
-		for (int i = 0; i < genNum; i++)
-		{
-			winnerList << tempStudentArray[i] << ": " << tempPrizeArray[i] << endl;
-		}
-
-
-		//Renmove the names and prizes from the text files
-
-
-		/*student_names.open("studentNames.txt");
-		string l;
-		ofstream temp;
-		temp.open("newNames.txt");
-		string deleteN = "Alex";
-
-		while (getline(student_names, l))
-		{
-
-				l.replace(l.find(deleteN), deleteN.length(), "");
-				temp << l << endl;
-
-		}
-
-		temp.close();
-		student_names.close();
-		remove("studentNames.txt");
-		rename("newNames.txt", "studentNames.txt");*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-		//step 1: prizeVector[distrForPrizes]; 
-		//step 2: check if the called prize is in the temp array
-		//step 3: if not, add called prize to temp array
-		//step 4: call the next random number
 
 		//check winner name against the 'prizeWinners' file; if it's there, delete name from 'studentNames' file & pick another name. Test again, until name is no longer a duplicate
-		//write their names into the 'prizeWinners' file
-		//delete their names from the 'studentNames' file
+		//issue: we have a way to check the file, but it's going to require copying code to check for duplicates within tempStudentArray
+		for (int i = 0; i < NUM; i++)
+		{
+			for (unsigned int j = 0; j < prizeWinnerVector.size(); j++)
+			{
+				if (tempStudentArray[i] == prizeWinnerVector[j])
+				{
+					cout << "There is a duplicate: " + prizeWinnerVector[j] << endl;
+					tempStudentArray[i] = studentNameVector[rand() % studentNameVector.size()];
+				}
+				else
+					continue;
+			}
+		}
+
+		//open the prizeWinners file for writing
+		winners.open("prizeWinners.txt", ios::app);
+		//loops through tempStudentArray and writes each winner into the prizeWinners file
+		for (auto t = tempStudentArray.begin(); t != tempStudentArray.end(); ++t)
+		{
+			winners << *t << '\n';
+		}
+
+		//open the studentNames file for writing -- empty contents
+		student_names.open("studentNames.txt", ios::out);
+		//loops through studentNameVector and writes each item into the studentNames file
+		for (auto t = studentNameVector.begin(); t != studentNameVector.end(); ++t)
+		{
+			student_names << *t << '\n';
+		}
+
+		winners.close();
+		student_names.close();
 
 		//find 5 random prizes
-		//write the prize into the 'prizeWinners' file
-		//delete the prize from the 'prizes' file
+		for (int i = 0; i < NUM; i++)
+		{
+			tempPrizeArray[i] = prizeVector[rand() % prizeVector.size()];
 
-		//write vectors into files
+			for (int j = 0; j < NUM; j++)
+			{
+				if ((i != j) && (tempPrizeArray[i] == tempPrizeArray[j]))
+				{
+					if (prizeVector.size() < NUM)
+						tempPrizeArray[i] = "null";
+					else
+					{
+						tempPrizeArray[i] = generateAgain(prizeVector, tempPrizeArray, i);
+						break;
+					}
+				}
+				else
+					continue;
+			}
+		}
+
+		for (int i = 0; i < NUM; i++)
+		{
+			//loops through prizeVector to find each item in tempPrizeArray, then deletes it from prizeVector
+			vector<string>::iterator position2 = find(prizeVector.begin(), prizeVector.end(), tempPrizeArray[i]);
+			if (position2 != prizeVector.end())
+				prizeVector.erase(position2);
+		}
+
+		//open the prizeWinners file for writing
+		winners.open("prizeWinners.txt", ios::app);
+		//loops through tempPrizeArray and writes each prize into the prizeWinners file
+		for (auto t = tempPrizeArray.begin(); t != tempPrizeArray.end(); ++t)
+		{
+			winners << *t << '\n';
+		}
+
+		//open the prize file for writing -- empty contents
+		prizes.open("prizes1.txt", ios::out);
+		//loops through prizeVector and writes each item into the prizes file
+		for (auto t = prizeVector.begin(); t != prizeVector.end(); ++t)
+		{
+			prizes << *t << '\n';
+		}
 
 		//close files
 		prizes.close();
-		student_names.close();
 		winners.close();
 
-		//return 5 winners & 5 prizes
+		//print out the winners and their prizes
+		for (int i = 0; i < NUM; i++)
+		{
+			cout << tempStudentArray[i] + " will receive " + tempPrizeArray[i] + "!" << endl;
+		}
 	}
 }
 
-string generateAgain(vector<string> vec, string array[], int index)
+/*
+This function will loop through the studentNameVector until a unique name is located
+*/
+string generateAgain(vector<string> vec, vector<string> array, int index)
 {
 	bool isSame = false;
 
@@ -233,7 +203,7 @@ string generateAgain(vector<string> vec, string array[], int index)
 	{
 		array[index] = vec[rand() % vec.size()];
 
-		for (int i = 0; i < 5; i++)
+		for (unsigned int i = 0; i < array.size(); i++)
 		{
 			if ((index != i) && array[index] == array[i])
 				isSame = true;
